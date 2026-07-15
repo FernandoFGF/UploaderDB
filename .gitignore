@@ -1,0 +1,20 @@
+# Datos de测量 (datos de input, no código)
+input/
+
+# Logs / runs por timestamp
+2026*/
+
+# Cache de Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Estado de subidas (no es código, es runtime state)
+done_*.json
+latest
+
+# PDF de instrucciones (no es código del proyecto)
+HWDB_Instructions_and_Commands-1.pdf
+
+# Metadatos de Windows
+*Zone.Identifier
