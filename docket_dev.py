@@ -5,7 +5,7 @@
 # CONFIGURACIÓN DE INPUT
 # =========================
 
-box = "Box19-upload/Tray000025-upload"
+box = "Box05_checked/Tray000144_checked"
 base_path = f"input/{box}"
 
 # =========================

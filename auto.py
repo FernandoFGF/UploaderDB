@@ -2,10 +2,32 @@ import subprocess
 import json
 import re
 import sys
+import shutil
 from pathlib import Path
 
 INPUT_DIR = Path("input")
 SUMMARY_FILE = Path("/mnt/c/Users/Ferna/Desktop/database/SiPM_Data_Tools/checked/summary.xlsx")
+GARBAGE_DIR = Path("garbage")
+TIMESTAMP_RE = re.compile(r"^\d{8}T\d{6}$")
+
+# =========================
+# MOVER CARPETAS TIMESTAMP A GARBAGE
+# =========================
+def move_timestamp_dirs_to_garbage(garbage_dir=GARBAGE_DIR):
+    garbage_dir.mkdir(exist_ok=True)
+    for entry in Path(".").iterdir():
+        if not entry.is_dir():
+            continue
+        if entry.name == garbage_dir.name or entry.name.startswith("."):
+            continue
+        if TIMESTAMP_RE.match(entry.name):
+            try:
+                target = garbage_dir / entry.name
+                if target.exists():
+                    shutil.rmtree(target)
+                shutil.move(str(entry), str(target))
+            except Exception as e:
+                print(f"[garbage] WARN no pude mover {entry.name}: {e}")
 
 # =========================
 # LOAD / SAVE STATE (JSON)
@@ -172,13 +194,16 @@ def main():
 
         box_dirs = boxes[box_id]
 
-        # buscar la tray por prefijo (Tray000097 => Tray000097_upload, etc.)
+        # buscar la tray por numero (Tray138 => Tray000138_checked, etc.)
+        target_tray_num = re.sub(r'\D', '', target_tray).lstrip('0') or '0'
         found = None
         for box_dir in box_dirs:
             for d in box_dir.iterdir():
-                if d.is_dir() and d.name.lower().startswith(target_tray.lower()):
-                    found = (box_dir, d)
-                    break
+                if d.is_dir():
+                    dir_num = re.sub(r'\D', '', d.name).lstrip('0') or '0'
+                    if dir_num == target_tray_num:
+                        found = (box_dir, d)
+                        break
             if found:
                 break
 
@@ -207,6 +232,7 @@ def main():
                 state[box_id].append(tray_name)
             save_state(state, state_file)
             update_summary(box_id, tray_name)
+            move_timestamp_dirs_to_garbage()
 
             print(f"✔ DONE {tray_rel}")
 
@@ -267,6 +293,7 @@ def main():
                     state[box_id].append(tray_name)
                     save_state(state, state_file)
                     update_summary(box_id, tray_name)
+                    move_timestamp_dirs_to_garbage()
 
                     print(f"✔ DONE {tray_rel}")
 
