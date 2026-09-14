@@ -130,24 +130,10 @@ Dev vs prod dockets differ only in Part Type / Test Name
 `SiPM Mass Test Results`). `auto.py` picks the file, you never edit them
 by hand (the `box = "..."` line is rewritten automatically).
 
-## 6. Folder structure (what is sent and what is not)
-
-```
-uploader/
-  auto.py                <- orchestrator
-  docket_dev.py          <- dev docket (box is auto-rewritten)
-  docket_prod.py         <- prod docket (box is auto-rewritten)
-  SISYPHUS_PATCH.md      <- mandatory library fix
-  requirements.txt       <- dependencies
-  README.md              <- this guide
-  input/Box*             <- your data (local, never committed)
-  garbage/*              <- run trash (local, never committed)
-  done_*.json            <- upload state (local, never committed)
-  latest                 <- symlink to last run (local, never committed)
-```
+## 6. Local-only files
 
 Your data and state files (`input/`, `garbage/`, `done_*.json`, `latest`)
-are local only and never committed to git.
+are local only and never committed to git. Everything else is code.
 
 ## 7. Troubleshooting
 
