@@ -134,31 +134,20 @@ by hand (the `box = "..."` line is rewritten automatically).
 
 ```
 uploader/
-  auto.py                <- orchestrator (DO send, summary removed)
-  docket_dev.py          <- dev docket, placeholder box (DO send)
-  docket_prod.py         <- prod docket, placeholder box (DO send)
-  SISYPHUS_PATCH.md      <- mandatory library fix (DO send)
-  requirements.txt       <- deps (DO send)
-  README.md              <- this guide (DO send)
-  .gitignore             <- ignores data/state (DO send)
-  input/.gitkeep         <- keeps empty folder (DO send)
-  garbage/.gitkeep       <- keeps empty folder (DO send)
-  input/Box*             <- YOUR raw data (DO NOT send, ignored)
-  garbage/*              <- local run trash (DO NOT send, ignored)
-  done_*.json            <- YOUR upload state (DO NOT send, ignored)
-  latest                 <- symlink to last run (DO NOT send, ignored)
-  2026*/                 <- run folders before cleanup (DO NOT send, ignored)
-  HWDB_Instructions_and_Commands-1.pdf (DO NOT send, ignored)
+  auto.py                <- orchestrator
+  docket_dev.py          <- dev docket (box is auto-rewritten)
+  docket_prod.py         <- prod docket (box is auto-rewritten)
+  SISYPHUS_PATCH.md      <- mandatory library fix
+  requirements.txt       <- dependencies
+  README.md              <- this guide
+  input/Box*             <- your data (local, never committed)
+  garbage/*              <- run trash (local, never committed)
+  done_*.json            <- upload state (local, never committed)
+  latest                 <- symlink to last run (local, never committed)
 ```
 
-To hand the project to another laboratory, send ONLY this branch:
-
-```bash
-git archive --format=zip --output=uploader-export.zip sharing_uploader
-```
-
-or `git clone -b sharing_uploader https://github.com/FernandoFGF/UploaderDB.git`. Never zip `input/`, `garbage/`,
-`done_*.json` or `latest` — the recipient recreates them locally.
+Your data and state files (`input/`, `garbage/`, `done_*.json`, `latest`)
+are local only and never committed to git.
 
 ## 7. Troubleshooting
 
@@ -172,18 +161,11 @@ or `git clone -b sharing_uploader https://github.com/FernandoFGF/UploaderDB.git`
 | Tray skipped but never uploaded | Old `done_*.json` entry | Remove the tray from `done_dev/prod.json` and re-run |
 | `❌ ERROR en ... -> STOP` | HWDB rejected the tray | Fix the xlsx, remove entry from `done_*.json`, re-run |
 
-## 8. Portability notes for this delivery
+## 8. Notes
 
-- Branch `sharing_uploader`: export version. `main` keeps the internal setup.
-- Removed external output: `auto.py` no longer touches
-  `/mnt/c/Users/Ferna/Desktop/database/SiPM_Data_Tools/checked/summary.xlsx`.
-  `update_summary()` is now a no-op; `openpyxl` is no longer required.
-  The only state is local `done_dev.json` / `done_prod.json`.
-- New `requirements.txt`: `requests` only (stdlib for the rest).
-- `docket_dev.py` / `docket_prod.py`: `box` reset to
-  `Box00_checked/Tray000000_checked` placeholder; `auto.py` rewrites it.
-  Uncommitted local `box` changes on `main` are NOT in this branch.
-- `.gitignore`: ignores `input/*`, `garbage/*`, `done_*.json`, `latest`,
-  `2026*/`, PDF and `*Zone.Identifier`, keeps `.gitkeep` placeholders.
-- Added `SISYPHUS_PATCH.md` to git (was untracked): recipient MUST apply it
-  in their own copy of `DUNE-HWDB-Python` (file outside this repo).
+- No external spreadsheet: upload progress is tracked only in local
+  `done_dev.json` / `done_prod.json`. No `openpyxl` needed.
+- The `box = "..."` line in the dockets is rewritten automatically by
+  `auto.py`; you never edit it by hand.
+- `SISYPHUS_PATCH.md` must be applied to your own copy of
+  `DUNE-HWDB-Python` (a file outside this repo).
