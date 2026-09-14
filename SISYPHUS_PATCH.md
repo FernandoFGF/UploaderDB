@@ -1,29 +1,29 @@
-# Parche en Sisyphus
+# Sisyphus patch
 
-## Qué aplicaba
+## What it fixes
 
-`Sisyphus` tiene un sistema de caché para evitar llamadas repetidas a la
-API de GitHub. En teoría, `display_header()` solo debería consultar
-`https://api.github.com/repos/DUNE/DUNE-HWDB-Python/releases/latest` una
-vez al día y usar el valor cacheado el resto del día. En la práctica, el
-caché estaba roto: la condición que decidía si ya teníamos valor
-cacheado miraba un atributo (`self.tag_name`) que **nunca se setea** en
-ningún sitio del código. Resultado: cada llamada a
-`display_header()` hacía 2 peticiones a GitHub en vez de 0. Multiplicado
-por N trays y el rate limit de GitHub (60 req/h sin token), el
-`KeyError: 'tag_name'` aparecía tarde o temprano y abortaba el upload
-entero antes de procesar nada.
+`Sisyphus` has a caching system to avoid repeated calls to the
+GitHub API. In theory, `display_header()` should only query
+`https://api.github.com/repos/DUNE/DUNE-HWDB-Python/releases/latest` once
+a day and use the cached value for the rest of the day. In practice, the
+cache was broken: the condition deciding whether we already had a
+cached value looked at an attribute (`self.tag_name`) that is **never set**
+anywhere in the code. Result: every call to
+`display_header()` made 2 requests to GitHub instead of 0. Multiplied
+by N trays and the GitHub rate limit (60 req/h without a token), the
+`KeyError: 'tag_name'` showed up sooner or later and aborted the whole
+upload before processing anything.
 
-El bug estaba en `Sisyphus/Configuration/_Configuration.py:650`. El
-código correcto (el que el caché setea) es `self.latest_release_version`.
+The bug was in `Sisyphus/Configuration/_Configuration.py:650`. The
+correct code (the one the cache sets) is `self.latest_release_version`.
 
-## Archivos modificados
+## Modified files
 
 `~/HWDBSiPM/DUNE-HWDB-Python-1.2.4.2/lib/Sisyphus/Configuration/_Configuration.py`
-(fuera de `uploader/`, dentro de la librería `DUNE-HWDB-Python`
-instalada en el entorno).
+(outside `uploader/`, inside the `DUNE-HWDB-Python` library
+installed in the environment).
 
-Backups de los originales:
+Backups of the originals:
 - `~/HWDBSiPM/DUNE-HWDB-Python-1.2.4.2/lib/Sisyphus/Configuration/_Configuration.py.bak`
 
 ## Diff
@@ -37,44 +37,44 @@ Backups de los originales:
          return self.latest_release_version
 ```
 
-## Qué NO modifica
+## What it does NOT change
 
-- `uploader/auto.py` no se ha tocado.
-- No se ha creado ningún archivo nuevo en `uploader/`.
-- La lógica de carga (`hwdb-upload docket_prod.py`, `--submit`, etc.) es
-  exactamente la misma.
-- El `display_header()` se ejecuta igual, imprime el banner y (si hay
-  versión nueva) el `Notice`. La única diferencia es que ahora usa el
-  caché correctamente.
-- La función `newer_version_exists()` no se ha tocado.
-- El sistema de caché del archivo `~/.sisyphus/config.json` (líneas
-  545-558 de `_Configuration.py`) no se ha tocado; el fix hace que ese
-  caché **funcione** por primera vez.
+- `uploader/auto.py` was not touched.
+- No new file was created in `uploader/`.
+- The upload logic (`hwdb-upload docket_prod.py`, `--submit`, etc.) is
+  exactly the same.
+- `display_header()` runs the same way, prints the banner and (if there
+  is a new version) the `Notice`. The only difference is that it now uses
+  the cache correctly.
+- The `newer_version_exists()` function was not touched.
+- The cache system in `~/.sisyphus/config.json` (lines
+  545-558 of `_Configuration.py`) was not touched; the fix makes that
+  cache **work** for the first time.
 
-## Verificación
+## Verification
 
-Test ejecutado (en `C:\Users\Ferna\AppData\Local\Temp\opencode\test_cache.py`):
-mockea `requests.get`, llama a `display_header()` 3 veces, cuenta
-llamadas HTTP. Resultado:
+Test run (in `C:\Users\Ferna\AppData\Local\Temp\opencode\test_cache.py`):
+mocks `requests.get`, calls `display_header()` 3 times, counts
+HTTP calls. Result:
 
 ```
-[TEST] Llamadas a GitHub despues de display_header 1: 1
-[TEST] Llamadas a GitHub despues de display_header 2: 1
-[TEST] Llamadas a GitHub despues de display_header 3: 1
-[TEST] OK: la cache funciona, 1 sola llamada a GitHub para 3 invocaciones de display_header
+[TEST] GitHub calls after display_header 1: 1
+[TEST] GitHub calls after display_header 2: 1
+[TEST] GitHub calls after display_header 3: 1
+[TEST] OK: cache works, 1 single GitHub call for 3 display_header invocations
 ```
 
-Con el bug original serían 6 llamadas (2 por display_header × 3). Con el
-fix: 1 sola.
+With the original bug it would be 6 calls (2 per display_header x 3). With
+the fix: just 1.
 
-## Cómo revertir
+## How to revert
 
-Para volver a la versión original de `_Configuration.py`:
+To go back to the original `_Configuration.py`:
 
 ```bash
 mv /home/ugrlab/HWDBSiPM/DUNE-HWDB-Python-1.2.4.2/lib/Sisyphus/Configuration/_Configuration.py.bak \
    /home/ugrlab/HWDBSiPM/DUNE-HWDB-Python-1.2.4.2/lib/Sisyphus/Configuration/_Configuration.py
 ```
 
-Si actualizas `DUNE-HWDB-Python` (pip, git pull, etc.) el parche se
-perderá y tendrás que reaplicarlo.
+If you update `DUNE-HWDB-Python` (pip, git pull, etc.) the patch will be
+lost and you will have to re-apply it.
