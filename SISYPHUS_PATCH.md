@@ -53,19 +53,8 @@ Backups of the originals:
 
 ## Verification
 
-Test run (in `C:\Users\Ferna\AppData\Local\Temp\opencode\test_cache.py`):
-mocks `requests.get`, calls `display_header()` 3 times, counts
-HTTP calls. Result:
-
-```
-[TEST] GitHub calls after display_header 1: 1
-[TEST] GitHub calls after display_header 2: 1
-[TEST] GitHub calls after display_header 3: 1
-[TEST] OK: cache works, 1 single GitHub call for 3 display_header invocations
-```
-
-With the original bug it would be 6 calls (2 per display_header x 3). With
-the fix: just 1.
+Mocking `requests.get` and calling `display_header()` 3 times results in
+1 single GitHub call (before the fix: 6, i.e. 2 per call).
 
 ## How to revert
 
