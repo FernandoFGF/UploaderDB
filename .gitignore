@@ -1,8 +1,12 @@
-# Datos de测量 (datos de input, no código)
-input/
+# Datos de input (no codigo, cada lab pone los suyos)
+input/*
+!input/.gitkeep
 
-# Logs / runs por timestamp
+# Logs / runs por timestamp (local, p. ej. 20260727T133449)
 2026*/
+garbage/*
+!garbage/.gitkeep
+latest
 
 # Cache de Python
 __pycache__/
@@ -11,7 +15,6 @@ __pycache__/
 
 # Estado de subidas (no es código, es runtime state)
 done_*.json
-latest
 
 # PDF de instrucciones (no es código del proyecto)
 HWDB_Instructions_and_Commands-1.pdf

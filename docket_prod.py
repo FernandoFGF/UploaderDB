@@ -5,7 +5,7 @@
 # CONFIGURACIÓN DE INPUT
 # =========================
 
-box = "Box28_checked/Tray000874_checked"
+box = "Box00_checked/Tray000000_checked"  # placeholder, auto.py lo reescribe en cada subida
 base_path = f"input/{box}"
 
 # =========================
