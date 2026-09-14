@@ -38,7 +38,7 @@ python3 --version
 1. Download this branch (no data included):
 
 ```bash
-git clone -b sharing_uploader <URL-DEL-REPO> uploader
+git clone -b sharing_uploader https://github.com/FernandoFGF/UploaderDB.git uploader
 cd uploader
 ```
 
@@ -157,7 +157,7 @@ To hand the project to another laboratory, send ONLY this branch:
 git archive --format=zip --output=uploader-export.zip sharing_uploader
 ```
 
-or `git clone -b sharing_uploader <URL>`. Never zip `input/`, `garbage/`,
+or `git clone -b sharing_uploader https://github.com/FernandoFGF/UploaderDB.git`. Never zip `input/`, `garbage/`,
 `done_*.json` or `latest` — the recipient recreates them locally.
 
 ## 7. Troubleshooting
