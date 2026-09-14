@@ -1,4 +1,4 @@
-# UploaderDB — versión para otro laboratorio (rama para-otro-lab)
+# UploaderDB — version sharing (rama sharing_uploader)
 # auto.py solo usa librería estándar. Sin dependencias obligatorias.
 # Opcional (solo si reactivas el summary interno, no incluido aquí):
 # openpyxl>=3.1.0

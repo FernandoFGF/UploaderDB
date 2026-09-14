@@ -38,11 +38,11 @@ python3 --version
 1. Download this branch (no data included):
 
 ```bash
-git clone -b para-otro-lab <URL-DEL-REPO> uploader
+git clone -b sharing_uploader <URL-DEL-REPO> uploader
 cd uploader
 ```
 
-Or as zip: `git archive --format=zip --output=uploader-export.zip para-otro-lab`.
+Or as zip: `git archive --format=zip --output=uploader-export.zip sharing_uploader`.
 
 2. Install Python deps (only `requests`, stdlib for the rest):
 
@@ -154,10 +154,10 @@ uploader/
 To hand the project to another laboratory, send ONLY this branch:
 
 ```bash
-git archive --format=zip --output=uploader-export.zip para-otro-lab
+git archive --format=zip --output=uploader-export.zip sharing_uploader
 ```
 
-or `git clone -b para-otro-lab <URL>`. Never zip `input/`, `garbage/`,
+or `git clone -b sharing_uploader <URL>`. Never zip `input/`, `garbage/`,
 `done_*.json` or `latest` — the recipient recreates them locally.
 
 ## 7. Troubleshooting
@@ -174,7 +174,7 @@ or `git clone -b para-otro-lab <URL>`. Never zip `input/`, `garbage/`,
 
 ## 8. Portability notes for this delivery
 
-- Branch `para-otro-lab`: export version. `main` keeps the internal setup.
+- Branch `sharing_uploader`: export version. `main` keeps the internal setup.
 - Removed external output: `auto.py` no longer touches
   `/mnt/c/Users/Ferna/Desktop/database/SiPM_Data_Tools/checked/summary.xlsx`.
   `update_summary()` is now a no-op; `openpyxl` is no longer required.
