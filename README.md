@@ -73,7 +73,7 @@ Full details, backup and revert instructions in `SISYPHUS_PATCH.md`.
 
 ## 5. Normal use (each batch)
 
-1. Copy your checked data into `input/`. Must look like:
+1. Copy your checked data into `input/` (local, git-ignored). Must look like:
 
 ```
 input/
@@ -97,8 +97,9 @@ python3 auto.py Box05 Tray138   # direct: numeric match, zeros ignored
 ```
 
 3. Answer `dev` or `prod`. Prod asks explicit `si/yes` confirmation.
-4. Progress is saved after each tray in `done_dev.json` / `done_prod.json`.
-   Re-running skips with `✔ SKIP`. Delete the entry to force re-upload.
+4. Progress is saved after each tray in `done_dev.json` / `done_prod.json`
+   (local, git-ignored). Re-running skips with `✔ SKIP`. Delete the entry
+   to force re-upload.
 5. Timestamp folders (`20260727T...`) are auto-moved to `garbage/`.
 
 Dev vs prod dockets differ only in Part Type / Test Name
@@ -106,12 +107,7 @@ Dev vs prod dockets differ only in Part Type / Test Name
 `SiPM Mass Test Results`). `auto.py` picks the file, you never edit them
 by hand (the `box = "..."` line is rewritten automatically).
 
-## 6. Local-only files
-
-Your data and state files (`input/`, `garbage/`, `done_*.json`, `latest`)
-are local only and never committed to git. Everything else is code.
-
-## 7. Troubleshooting
+## 6. Troubleshooting
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
