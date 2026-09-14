@@ -13,25 +13,13 @@ Uploads already-checked SiPM trays to the DUNE HWDB database:
 4. Tracks progress in `done_dev.json` / `done_prod.json` (skip on re-run).
 5. Moves `YYYYMMDDTHHMMSS` run folders to `garbage/`.
 
-Secondary files:
-
-- `docket_dev.py`: docket for dev/sandbox DB (`Z.Sandbox.HWDBUnitTest`).
-- `docket_prod.py`: docket for production DB (`D.FD-HD PDS.Module.SiPM board`).
-- `SISYPHUS_PATCH.md`: mandatory one-line fix in the HWDB library (see section 4).
-- `HWDB_Instructions_and_Commands-1.pdf`: official reference (optional, not in git).
+See also `SISYPHUS_PATCH.md` (mandatory one-line fix, section 4).
 
 ## 2. Requirements
 
 - Python 3.9+ (3.11 or 3.12 recommended).
 - Linux (tested on Ubuntu) or WSL. Windows native works if `hwdb-upload` is available.
 - DUNE-HWDB-Python library (provides `hwdb-upload`), sibling of this folder.
-- Nothing to compile.
-
-Check your Python:
-
-```bash
-python3 --version
-```
 
 ## 3. Installation (5 minutes)
 
@@ -42,8 +30,6 @@ git clone -b sharing_uploader https://github.com/FernandoFGF/UploaderDB.git uplo
 cd uploader
 ```
 
-Or as zip: `git archive --format=zip --output=uploader-export.zip sharing_uploader`.
-
 2. Install Python deps (only `requests`, stdlib for the rest):
 
 ```bash
@@ -53,22 +39,19 @@ python3 -m pip install -r requirements.txt
 3. Install / locate DUNE-HWDB-Python (provides `hwdb-upload`):
 
 ```bash
-ls ../DUNE-HWDB-Python-1.2.4.2/hwdb-upload
+ls ../DUNE-HWDB-Python*/hwdb-upload
 # must exist. If not, download it from DUNE and place it next to uploader/
 ```
 
 4. Apply the Sisyphus patch (section 4, mandatory).
-5. Put your data in `input/` (see section 5). `input/`, `garbage/`,
-   `done_*.json` and `latest` are local and never committed.
+5. Put your data in `input/` (see section 5).
 
-## 4. Mandatory fix: Sisyphus patch (they DO have to do it)
+## 4. Mandatory fix: Sisyphus patch
 
 `Sisyphus` caches the GitHub release check badly: `get_latest_release_version()`
 looks at `self.tag_name`, which is never set, so every `display_header()`
 fires 2 requests to GitHub. With N trays you hit the 60 req/h limit and get
 `KeyError: 'tag_name'`, aborting the whole upload.
-
-Full details in `SISYPHUS_PATCH.md`. Summary:
 
 File to fix (inside the HWDB library, OUTSIDE `uploader/`):
 
@@ -86,14 +69,7 @@ File to fix (inside the HWDB library, OUTSIDE `uploader/`):
           return self.latest_release_version
 ```
 
-Backup first, then re-apply after every library update (pip / git pull wipes it).
-
-Verification: call `display_header()` 3x with mocked `requests.get` → 1 HTTP
-call total (before: 6). See `SISYPHUS_PATCH.md`.
-
-What it does NOT change: `auto.py` logic, docket syntax, `--submit` flow,
-`newer_version_exists()`, `~/.sisyphus/config.json` cache. It just makes
-the existing cache work.
+Full details, backup and revert instructions in `SISYPHUS_PATCH.md`.
 
 ## 5. Normal use (each batch)
 
@@ -139,19 +115,9 @@ are local only and never committed to git. Everything else is code.
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| `No se han detectado cajas en input/` | Empty / misnamed folder | Must be `input/Box05_checked` (capital B, `BoxNN` prefix) |
-| `Box 'Box08' no encontrado` | Typo in direct mode | `python3 auto.py Box08 Tray000097`, check menu list first |
+| No box found in `input/` | Empty / misnamed folder or typo | Must be `input/Box05_checked` (capital B, `BoxNN` prefix) |
 | `KeyError: 'tag_name'` | Sisyphus cache bug | Apply section 4 patch |
-| `hwdb-upload: command not found` | HWDB lib not on PATH | Use full path `../DUNE-HWDB-Python-1.2.4.2/hwdb-upload` or add to PATH |
+| `hwdb-upload: command not found` | HWDB lib not on PATH | Use full path `../DUNE-HWDB-Python*/hwdb-upload` or add to PATH |
 | `python: command not found` (in hwdb-upload) | Script calls `python` not `python3` | Symlink or edit shebang to `python3` |
 | Tray skipped but never uploaded | Old `done_*.json` entry | Remove the tray from `done_dev/prod.json` and re-run |
 | `❌ ERROR en ... -> STOP` | HWDB rejected the tray | Fix the xlsx, remove entry from `done_*.json`, re-run |
-
-## 8. Notes
-
-- No external spreadsheet: upload progress is tracked only in local
-  `done_dev.json` / `done_prod.json`. No `openpyxl` needed.
-- The `box = "..."` line in the dockets is rewritten automatically by
-  `auto.py`; you never edit it by hand.
-- `SISYPHUS_PATCH.md` must be applied to your own copy of
-  `DUNE-HWDB-Python` (a file outside this repo).
